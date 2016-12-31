@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0 minimal-ui"/>
+        <meta name="description" content=""/>
+        <meta name="author" content=""/>
+        {% load staticfiles %}
+        <link rel="shortcut icon" href="{% static "favicon.ico" %}" />
+        <title>ThirdDegree</title>
+        <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.js"></script>
+        <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        {% block head %}{% endblock %}
+        <style type="text/css">
+            body {
+            background-image: url(http://www.yomommaspace.com/graphics/backgrounds/8/140.jpg); background-attachment:fixed;
+            color: white;
+            }
+            table, td { background-color:transparent; border-style:none; }
+            a {
+                color: yellow;
+            }
+            textarea:focus, input:focus {
+                color: black;
+            }
+        </style>
+<a href="http://www.yomommaspace.com/" target="_blank"><img src="http://www.yomommaspace.com/support.gif" alt="Myspace Layouts" style="position:absolute; left:0px; top: 0px;" border="0"></a>
+</head>
+    </head>
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top" style="background-color:#001433;">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/home/">Third Degree</a>
+                    <button class="navbar-toggle" data-target="#navbar-main" data-toggle="collapse" type="button">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div id="navbar-main" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/logout/">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div id="banner" class="page-header">
+                <h1>{% block title %}Third Degree{% endblock %}</h1>
+            </div>
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+			<div class="alert alert-dismissable {{ message.tags }}">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            {{ message }}
+			</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>

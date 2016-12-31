@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Edit Directory{% endblock %}
+{% block head %}Edit Directory{% endblock %}
+{% block content %}
+    <p><b>Username:</b> {{ user.username }}</p>
+    <p><b>Registration Name:</b> {{ user.client.name }}</p>
+    <p><b>Directory Name:</b> {{dir.name}}</p>
+    <br><br>
+    {% if error %}
+        <div class="alert alert-danger">
+            <strong>Error!</strong> {{error}}
+        </div>
+    {% endif %}
+    <div>
+        <form action="." method="POST" enctype=multipart/form-data>
+            {% csrf_token %}
+            <table>
+                <tr>
+                    {{ form.as_p }}
+                </tr>
+            </table>
+            <button type="Submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+    <br><br>
+    <p>
+        <table class="table table-bordered">
+            <tr>
+                <th>S. No.</th>
+                <th>File Name</th>
+                <th>Delete</th>
+            </tr>
+            {% for f in files %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{f}}</td>
+                    <td><a href="/file/delete/{{dir.id}}/{{f}}/"><span class="glyphicon sglyphicon-trash"
+></span></a></td>
+                </tr>
+        {% endfor %}
+        </table>
+    </p>
+{% endblock %}

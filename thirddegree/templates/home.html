@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Third Degre{% endblock %}
+{% block head %}Welcome to Third Degree{% endblock %}
+{% block content %}
+    <p><b>Username:</b> {{ user.username }}</p>
+    <p><b>Registration Name:</b> {{ user.client.name }}</p>
+    <p><a href="/create_dir/">Create New Directory</a></p>
+    <p>
+    <table class="table table-bordered">
+        <tr>
+            <th>S. No.</th>
+            <th>Name</th>
+            <th>Delete</th>
+        </tr>
+        {% for d in directories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><a href="/dir/{{d.id}}/">{{d.name}}</a></td>
+                <td><a href="/dir/delete/{{d.id}}/"><span class="glyphicon glyphicon-trash"
+></span></a></td>
+            </tr>
+    {% endfor %}
+    </table>
+    </p>
+{% endblock %}

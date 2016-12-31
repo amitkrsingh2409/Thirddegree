@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Create Directory{% endblock %}
+{% block head %}Create Directory{% endblock %}
+{% block content %}
+    <p><b>Username:</b> {{ user.username }}</p>
+    <p><b>Registration Name:</b> {{ user.client.name }}</p>
+    <div class="well">
+    <form class="form-horizontal" method="post" action=".">
+        {% csrf_token %}
+        Directory name:<br>
+        <input type="text" name="name" placeholder="Directory name" required>
+        <br><br>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+</div>
+{% endblock %}
