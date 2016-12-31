@@ -33,7 +33,7 @@
             {% for f in files %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{f}}</td>
+                    <td><a href="/file/view/{{dir.id}}/{{f}}/">{{f}}</a></td>
                     <td><a href="/file/delete/{{dir.id}}/{{f}}/"><span class="glyphicon glyphicon-trash"
     ></span></a></td>
                 </tr>

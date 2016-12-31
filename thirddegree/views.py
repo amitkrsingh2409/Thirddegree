@@ -1,13 +1,16 @@
+import os
 from thirddegree.forms import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.utils.encoding import smart_str
 from django.core.exceptions import ValidationError
 from django.core.cache import cache
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.views.static import serve
 
 from thirddegree.models import Client, ClientDirectories
 from thirddegree.cache import dump_client_files, fetch_client_files
@@ -127,3 +130,11 @@ def delete_file(request, pkey, name):
     user.client.save()
     url = reverse('edit_directory', args=[pkey])
     return HttpResponseRedirect(url)
+
+@login_required
+def view_file(request, pkey, name):
+    user = request.user
+    all_files = fetch_client_files(user.client.name)
+    fileparams = all_files.get(str(pkey), {}).get(name, {})
+    path = fileparams.get('path', '')
+    return serve(request, os.path.basename(path), os.path.dirname(path))
