@@ -2,14 +2,24 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from thirddegree.app_settings import CLIENT_FILES_STRUCTURE
 
+from thirddegree.models import MongoConnection
+
 def fetch_client_files(client_name, directory=None):
     '''
         Redis cache to fetch client files
     '''
     key = '{0}{1}'.format(CLIENT_FILES_STRUCTURE, client_name.replace(' ', '_'))
+    all_data = cache.get(key, {}) or {}
+    if not all_data:
+        query_dict = {key: {'$exists': True}}
+        conn = MongoConnection().get_connection()
+        db_data = conn['clientfiles'].collection.find_one(query_dict, {'_id':0}) or {}
+        all_data = db_data.get(key)
+        cache.set(key, all_data)
+        conn.close()
     if directory:
-        return cache.get(key, {}).get(directory) or {}
-    return cache.get(key, {}) or {}
+        return all_data.get(directory) or {}
+    return all_data
 
 
 def dump_client_files(client, directory, file_name, path_name, file_size):
@@ -36,3 +46,9 @@ def dump_client_files(client, directory, file_name, path_name, file_size):
     client.bandwidth = prev_bandwidth + int(file_size)
     client.storage = prev_storage + int(file_size)
     client.save()
+    query_dict = {key: {'$exists': True}}
+    # Update MongoDB
+    conn = MongoConnection().get_connection()
+    conn['clientfiles'].collection.update_one(query_dict, \
+                        {'$set': {key: all_files}}, upsert=True)
+    conn.close()

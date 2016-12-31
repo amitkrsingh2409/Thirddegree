@@ -15,6 +15,7 @@ from django.views.static import serve
 from thirddegree.models import Client, ClientDirectories
 from thirddegree.cache import dump_client_files, fetch_client_files
 from thirddegree.app_settings import DIRECTORIES_CACHE, CLIENT_FILES_STRUCTURE
+from thirddegree.models import MongoConnection
 
 @csrf_protect
 def register(request):
@@ -80,10 +81,10 @@ def edit_directory(request, pkey):
         if form.is_valid():
             upload_file = request.FILES['upload_file']
             file_size = upload_file.size
-            filename = u'/tmp/{0}'.format(upload_file.name)
+            pathname = u'/tmp/{0}'.format(upload_file.name)
             try:
                 dump_client_files(user.client, str(pkey), \
-                                  upload_file.name, filename, file_size)
+                os.path.splitext(upload_file.name)[0], pathname, file_size)
             except ValidationError as err:
                 files = fetch_client_files(user.client.name, directory=str(pkey))
                 return render(request,
@@ -92,7 +93,7 @@ def edit_directory(request, pkey):
                     'error': str(err.message),
                     'files': files.keys()}
                 )
-            with open(filename, 'wb+') as f:
+            with open(pathname, 'wb+') as f:
                 f.write(upload_file.read())
     else:
         form = FileUploadForm()
@@ -105,6 +106,7 @@ def edit_directory(request, pkey):
 
 @login_required
 def delete_directory(request, pkey):
+    conn = MongoConnection().get_connection()
     user = request.user
     cl_dir = ClientDirectories.objects.get(pk=pkey)
     cl_dir.delete()
@@ -115,17 +117,26 @@ def delete_directory(request, pkey):
     all_files.pop(str(pkey), None)
     key1 = '{0}{1}'.format(CLIENT_FILES_STRUCTURE, user.client.name.replace(' ', '_'))
     cache.set(key1, all_files)
+    query_dict = {key1: {'$exists': True}}
+    conn['clientfiles'].collection.update_one(query_dict, \
+                        {'$unset': {key: ''}})
+    conn.close()
     return HttpResponseRedirect('/home/')
 
 
 @login_required
 def delete_file(request, pkey, name):
+    conn = MongoConnection().get_connection()
     user = request.user
     prev_storage = user.client.storage
     all_files = fetch_client_files(user.client.name)
     fileparams = all_files.get(str(pkey), {}).pop(name, {})
     key1 = '{0}{1}'.format(CLIENT_FILES_STRUCTURE, user.client.name.replace(' ', '_'))
     cache.set(key1, all_files)
+    query_dict = {key1: {'$exists': True}}
+    conn['clientfiles'].collection.update_one(query_dict, \
+                        {'$set': {key1: all_files}})
+    conn.close()
     user.client.storage = prev_storage - (fileparams.get('size', 0))
     user.client.save()
     url = reverse('edit_directory', args=[pkey])

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.validators import MaxValueValidator
 from rest_framework.authtoken.models import Token
+from pymongo import MongoClient
+from pymongo import MongoReplicaSetClient
 
 from thirddegree.app_settings import DIRECTORIES_CACHE
 
@@ -64,3 +66,32 @@ class ClientDirectories(models.Model):
             client = self.client
             return client.name
         return None
+
+
+class MongoConnection(object):
+    '''
+        Mongo Connection - uses singleton class
+    '''
+
+    def __init__(self, timeout=2* 60*1000):
+        self.host = 'localhost'
+        self.port = 27017
+        self.database = 'thirddegree'
+        self.user = 'amit.singh'
+        self.password = 'thirddegree'
+        self.timeout = timeout
+        self.connection = dict()
+
+    def set_connection(self):
+        '''
+            Creates connection to MOGODB_URI
+        '''
+        self.connection = MongoClient(
+            host=self.host, port=self.port,
+            connectTimeoutMS=self.timeout
+        )
+
+    def get_connection(self):
+        if not self.connection:
+            self.set_connection()
+        return self.connection
