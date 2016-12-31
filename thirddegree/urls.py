@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^create_dir/$', create_directory),
     url(r'^dir/(\d+)/$', edit_directory, name='edit_directory'),
     url(r'^dir/delete/(\d+)/$', delete_directory),
-    url(r'^file/delete/(\d+)/(?P<name>[\w.@+-]+)/$', delete_file),
+    url(r'^file/delete/(?P<pkey>\d+)/(?P<name>[\w.@+-]+)/$', delete_file),
     url(r'^accounts/login/$', login), # If user is not login it will redirect to login page
     url(r'^register/$', register),
     url(r'^register/success/$', register_success),

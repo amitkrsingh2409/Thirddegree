@@ -82,17 +82,21 @@ def edit_directory(request, pkey):
                 dump_client_files(user.client, str(pkey), \
                                   upload_file.name, filename, file_size)
             except ValidationError as err:
+                files = fetch_client_files(user.client.name, directory=str(pkey))
                 return render(request,
                     'edit_directory.html', {'user': user, \
                     'dir': cl_dir, 'form': FileUploadForm(),
-                    'error': str(err.message)}
+                    'error': str(err.message),
+                    'files': files.keys()}
                 )
             with open(filename, 'wb+') as f:
                 f.write(upload_file.read())
     else:
         form = FileUploadForm()
+    files = fetch_client_files(user.client.name, directory=str(pkey))
     return render(request,
-        'edit_directory.html', {'user': user, 'dir': cl_dir, 'form': form}
+        'edit_directory.html', {'user': user, 'dir': cl_dir, 'form': form,
+        'files': files.keys()}
     )
 
 
@@ -114,12 +118,12 @@ def delete_directory(request, pkey):
 @login_required
 def delete_file(request, pkey, name):
     user = request.user
-    prev_storage = user.client
+    prev_storage = user.client.storage
     all_files = fetch_client_files(user.client.name)
-    fileparams = all_files.get(str(pkey), {}).pop(name, None)
+    fileparams = all_files.get(str(pkey), {}).pop(name, {})
     key1 = '{0}{1}'.format(CLIENT_FILES_STRUCTURE, user.client.name.replace(' ', '_'))
     cache.set(key1, all_files)
-    user.client.storage = prev_storage - (fileparams.get('size', 0)*1024*1024)
+    user.client.storage = prev_storage - (fileparams.get('size', 0))
     user.client.save()
     url = reverse('edit_directory', args=[pkey])
     return HttpResponseRedirect(url)
