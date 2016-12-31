@@ -16,14 +16,14 @@ $ CREATE USER amitsingh WITH PASSWORD 'thirddegree';<br />
 $ CREATE DATABASE thirddegree_db OWNER amitsingh;<br />
 <br />
 DATABASES = {<br />
-    'default': {<br />
-        'ENGINE': 'django.db.backends.postgresql',<br />
-        'NAME': 'thirddegree_db',<br />
-        'USER': 'amitsingh',<br />
-        'PASSWORD': 'thirddegree',<br />
-        'HOST': '',<br />
-        'PORT': '',<br />
-    }<br />
+?ts=4    'default': {<br />
+?ts=6        'ENGINE': 'django.db.backends.postgresql',<br />
+?ts=6        'NAME': 'thirddegree_db',<br />
+?ts=6        'USER': 'amitsingh',<br />
+?ts=6        'PASSWORD': 'thirddegree',<br />
+?ts=6        'HOST': '',<br />
+?ts=6        'PORT': '',<br />
+?ts=4    }<br />
 }<br />
 <br />
 $ pip install psycopg2<br />
